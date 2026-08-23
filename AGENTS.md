@@ -36,7 +36,7 @@ bun run pages:deploy
 
 ## Deploy
 
-- Cloudflare Pages: connect the GitHub repo in the dashboard. Build command `bun run build`, output directory `dist`.
+- Cloudflare Pages: connect the GitHub repo in the dashboard. Build command `bun run build`, output directory `dist`. Set `BUN_VERSION=1.4.0` (lockfile is v2; CF default Bun 1.2.x cannot parse it).
 - CLI: `wrangler login` then `bun run pages:deploy`.
 - SPA fallback is `public/_redirects`.
 

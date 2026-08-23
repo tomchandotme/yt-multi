@@ -33,6 +33,9 @@ Connect the repo in the Cloudflare Pages dashboard:
 | --- | --- |
 | Build command | `bun run build` |
 | Build output directory | `dist` |
+| Environment variable | `BUN_VERSION=1.4.0` (required — default CF Bun 1.2.x cannot read `bun.lock` v2) |
+
+Bun is pinned to 1.4.0 via `.bun-version`, `.tool-versions`, and `packageManager`. If the build still uses Bun 1.2.x, set `BUN_VERSION=1.4.0` under **Settings → Environment variables** and clear the build cache.
 
 Or deploy from the CLI:
 
