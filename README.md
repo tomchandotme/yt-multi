@@ -32,11 +32,11 @@ Connect the repo in the Cloudflare dashboard:
 | Setting | Value |
 | --- | --- |
 | Build command | `bun run build` |
-| Deploy command | `bun run deploy` |
+| Deploy command | `bun run deploy` or leave default `npx wrangler deploy` |
 | Build output directory | `dist` (Pages git deploy only; Workers Builds uses deploy command) |
 | Environment variable | `BUN_VERSION=1.4.0` (only if build still uses Bun 1.2.x) |
 
-Workers Builds defaults deploy to `npx wrangler deploy`, which fails for this Pages SPA. Use `bun run deploy` instead.
+Workers Builds defaults deploy to `npx wrangler deploy`. `wrangler.jsonc` points that at `./dist` with SPA fallback.
 
 Bun is pinned to 1.4.0 via `.bun-version`, `.tool-versions`, and `packageManager`.
 

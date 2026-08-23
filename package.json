@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc -b && vite build",
-		"deploy": "wrangler pages deploy dist --project-name=yt-multi",
+		"deploy": "wrangler deploy",
 		"lint": "oxlint",
 		"preview": "vite preview",
 		"pages:build": "bun run build",

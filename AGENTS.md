@@ -36,7 +36,7 @@ bun run pages:deploy
 
 ## Deploy
 
-- Cloudflare Workers Builds: build command `bun run build`, deploy command `bun run deploy` (not `npx wrangler deploy`).
+- Cloudflare Workers Builds: build command `bun run build`. Deploy uses `wrangler.jsonc` assets config (`npx wrangler deploy` or `bun run deploy`).
 - Cloudflare Pages (git): build command `bun run build`, output directory `dist`.
 - CLI: `wrangler login` then `bun run pages:deploy`.
 - SPA fallback is `public/_redirects`.
