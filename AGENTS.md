@@ -39,7 +39,7 @@ bun run pages:deploy
 - Cloudflare Workers Builds: build command `bun run build`. Deploy uses `wrangler.jsonc` assets config (`npx wrangler deploy` or `bun run deploy`).
 - Cloudflare Pages (git): build command `bun run build`, output directory `dist`.
 - CLI: `wrangler login` then `bun run pages:deploy`.
-- SPA fallback is `public/_redirects`.
+- SPA fallback is `assets.not_found_handling: "single-page-application"` in `wrangler.jsonc`. Do not add `public/_redirects` with `/* /index.html 200` — Workers treats that as an infinite loop.
 
 ## Avoid
 
