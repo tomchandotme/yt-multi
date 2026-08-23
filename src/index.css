@@ -1,0 +1,217 @@
+:root {
+	--color-bg: #0a0a0a;
+	--color-surface: #111111;
+	--color-border: #1c1c1c;
+	--color-border-focus: #4a4a4a;
+	--color-text: #b8b8b8;
+	--color-text-muted: #555555;
+	--color-text-strong: #ececec;
+	--color-accent: #e8e4df;
+	--color-accent-hover: #ffffff;
+	--color-accent-fg: #0a0a0a;
+	--color-error: #c96a6a;
+
+	--font-sans: "IBM Plex Sans", system-ui, sans-serif;
+	--font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+	--text-sm: 12px;
+	--text-base: 13px;
+	--text-lg: 14px;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+
+	--transition-fast: 120ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--transition-fast: 0ms;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
+	font-family: var(--font-sans);
+	font-size: var(--text-base);
+	font-weight: 400;
+	line-height: 1.4;
+	color: var(--color-text);
+	background: var(--color-bg);
+	-webkit-font-smoothing: antialiased;
+}
+
+.app {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+/* ——— stream bar ——— */
+
+.stream-bar {
+	flex-shrink: 0;
+	padding: var(--space-3);
+	background: var(--color-surface);
+	border-bottom: 1px solid var(--color-border);
+}
+
+.stream-bar__form {
+	display: flex;
+	gap: var(--space-2);
+}
+
+.stream-bar__input {
+	flex: 1;
+	min-width: 0;
+	padding: var(--space-2) var(--space-3);
+	border: 1px solid var(--color-border);
+	border-radius: 0;
+	background: var(--color-bg);
+	color: var(--color-text-strong);
+	font-family: var(--font-sans);
+	font-size: var(--text-base);
+	transition: border-color var(--transition-fast);
+}
+
+.stream-bar__input::placeholder {
+	color: var(--color-text-muted);
+}
+
+.stream-bar__input:focus {
+	outline: none;
+	border-color: var(--color-border-focus);
+}
+
+.stream-bar__input:focus-visible {
+	outline: 1px solid var(--color-text-strong);
+	outline-offset: 1px;
+}
+
+.stream-bar__add {
+	padding: var(--space-2) var(--space-4);
+	border: 1px solid var(--color-accent);
+	border-radius: 0;
+	background: var(--color-accent);
+	color: var(--color-accent-fg);
+	font-family: var(--font-sans);
+	font-size: var(--text-base);
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	cursor: pointer;
+	transition:
+		background var(--transition-fast),
+		border-color var(--transition-fast),
+		color var(--transition-fast);
+}
+
+.stream-bar__add:hover {
+	background: var(--color-accent-hover);
+	border-color: var(--color-accent-hover);
+}
+
+.stream-bar__add:focus-visible {
+	outline: 1px solid var(--color-text-strong);
+	outline-offset: 2px;
+}
+
+.stream-bar__error {
+	margin: var(--space-2) 0 0;
+	color: var(--color-error);
+	font-size: var(--text-sm);
+}
+
+.stream-bar__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-1);
+	margin: var(--space-2) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.stream-bar__chip {
+	display: flex;
+	align-items: center;
+	gap: var(--space-1);
+	padding: 2px 2px 2px var(--space-2);
+	background: var(--color-bg);
+	border: 1px solid var(--color-border);
+	font-size: var(--text-sm);
+	font-family: var(--font-mono);
+	color: var(--color-text);
+}
+
+.stream-bar__chip-remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	color: var(--color-text-muted);
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
+	transition: color var(--transition-fast);
+}
+
+.stream-bar__chip-remove:hover {
+	color: var(--color-text-strong);
+}
+
+.stream-bar__chip-remove:focus-visible {
+	outline: 1px solid var(--color-text-strong);
+	outline-offset: -1px;
+}
+
+/* ——— stream grid ——— */
+
+.stream-grid {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	gap: 1px;
+	overflow: hidden;
+	background: var(--color-border);
+}
+
+.stream-grid--empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--color-bg);
+}
+
+.stream-grid__hint {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: var(--text-lg);
+	letter-spacing: 0.02em;
+}
+
+.stream-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background: var(--color-bg);
+}

@@ -1,0 +1,29 @@
+{
+	"name": "yt-multi",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "oxlint",
+		"preview": "vite preview",
+		"pages:build": "bun run build",
+		"pages:deploy": "bun run pages:build && wrangler pages deploy dist --project-name=yt-multi",
+		"pages:dev": "wrangler pages dev dist"
+	},
+	"dependencies": {
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8"
+	},
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.4",
+		"oxlint": "^1.75.0",
+		"typescript": "~6.0.2",
+		"vite": "^8.2.0",
+		"wrangler": "^4.125.0"
+	}
+}
