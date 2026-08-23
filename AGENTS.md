@@ -36,8 +36,8 @@ bun run pages:deploy
 
 ## Deploy
 
-- CI: `.github/workflows/deploy.yml` builds on push to `main` and runs `wrangler pages deploy`.
-- Local deploy needs `wrangler login` first.
+- Cloudflare Pages: connect the GitHub repo in the dashboard. Build command `bun run build`, output directory `dist`.
+- CLI: `wrangler login` then `bun run pages:deploy`.
 - SPA fallback is `public/_redirects`.
 
 ## Avoid

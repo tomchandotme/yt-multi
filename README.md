@@ -27,14 +27,14 @@ bun run dev
 
 ## Deploy
 
-Pushes to `main` deploy automatically via GitHub Actions.
+Connect the repo in the Cloudflare Pages dashboard:
 
-Required repo secrets:
+| Setting | Value |
+| --- | --- |
+| Build command | `bun run build` |
+| Build output directory | `dist` |
 
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-
-Manual deploy:
+Or deploy from the CLI:
 
 ```bash
 bunx wrangler login
