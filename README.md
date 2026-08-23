@@ -27,15 +27,18 @@ bun run dev
 
 ## Deploy
 
-Connect the repo in the Cloudflare Pages dashboard:
+Connect the repo in the Cloudflare dashboard:
 
 | Setting | Value |
 | --- | --- |
 | Build command | `bun run build` |
-| Build output directory | `dist` |
-| Environment variable | `BUN_VERSION=1.4.0` (required — default CF Bun 1.2.x cannot read `bun.lock` v2) |
+| Deploy command | `bun run deploy` |
+| Build output directory | `dist` (Pages git deploy only; Workers Builds uses deploy command) |
+| Environment variable | `BUN_VERSION=1.4.0` (only if build still uses Bun 1.2.x) |
 
-Bun is pinned to 1.4.0 via `.bun-version`, `.tool-versions`, and `packageManager`. If the build still uses Bun 1.2.x, set `BUN_VERSION=1.4.0` under **Settings → Environment variables** and clear the build cache.
+Workers Builds defaults deploy to `npx wrangler deploy`, which fails for this Pages SPA. Use `bun run deploy` instead.
+
+Bun is pinned to 1.4.0 via `.bun-version`, `.tool-versions`, and `packageManager`.
 
 Or deploy from the CLI:
 
