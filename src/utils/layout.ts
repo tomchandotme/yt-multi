@@ -7,7 +7,12 @@ export interface OptimalLayout {
 	tileHeight: number;
 }
 
-export function computeOptimalLayout(count: number, width: number, height: number): OptimalLayout {
+export function computeOptimalLayout(
+	count: number,
+	width: number,
+	height: number,
+	chromeHeight = 0,
+): OptimalLayout {
 	if (count === 0 || width <= 0 || height <= 0) {
 		return { cols: 0, rows: 0, tileWidth: 0, tileHeight: 0 };
 	}
