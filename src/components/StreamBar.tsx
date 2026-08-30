@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState, type FormEvent, type Ref } from "react";
-import { attemptAdd, parseYouTubeId } from "../utils/youtube";
+import { attemptAdd, parseStream, type Stream } from "../utils/stream";
 
 interface StreamBarProps {
-	streams: string[];
-	onAdd: (videoId: string) => void;
+	streams: Stream[];
+	onAdd: (stream: Stream) => void;
 	onClear: () => void;
 	labelsPinned: boolean;
 	onToggleLabels: () => void;
@@ -41,7 +41,7 @@ export function StreamBar({
 		(raw: string) => {
 			const result = attemptAdd(raw, streams);
 			if (result.kind === "ok") {
-				onAdd(result.videoId);
+				onAdd(result.stream);
 				setInput("");
 				setError("");
 				return;
@@ -109,7 +109,7 @@ export function StreamBar({
 						}}
 						onPaste={(event) => {
 							const text = event.clipboardData.getData("text");
-							if (!parseYouTubeId(text)) return;
+							if (!parseStream(text)) return;
 							event.preventDefault();
 							applyAdd(text);
 						}}

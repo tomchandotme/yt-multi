@@ -7,10 +7,10 @@ import {
 	saveLabelsPinned,
 	saveStreams,
 } from "./utils/storage";
-import { addStream, moveStream } from "./utils/youtube";
+import { addStream, moveStream, sameStream, type Stream } from "./utils/stream";
 
 function App() {
-	const [streams, setStreams] = useState<string[]>(() => loadStreams());
+	const [streams, setStreams] = useState<Stream[]>(() => loadStreams());
 	const [labelsPinned, setLabelsPinned] = useState(() => loadLabelsPinned());
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -22,12 +22,12 @@ function App() {
 		saveLabelsPinned(labelsPinned);
 	}, [labelsPinned]);
 
-	function handleAdd(videoId: string) {
-		setStreams((prev) => addStream(prev, videoId));
+	function handleAdd(stream: Stream) {
+		setStreams((prev) => addStream(prev, stream));
 	}
 
-	function handleRemove(videoId: string) {
-		setStreams((prev) => prev.filter((id) => id !== videoId));
+	function handleRemove(stream: Stream) {
+		setStreams((prev) => prev.filter((item) => !sameStream(item, stream)));
 	}
 
 	function handleReorder(from: number, to: number) {
