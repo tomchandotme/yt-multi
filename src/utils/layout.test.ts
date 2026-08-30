@@ -25,6 +25,15 @@ describe("computeOptimalLayout", () => {
 		});
 	});
 
+	test("no chrome keeps a 3-stack on a 400x900 box", () => {
+		expect(computeOptimalLayout(3, 400, 900)).toEqual({
+			cols: 1,
+			rows: 3,
+			tileWidth: 400,
+			tileHeight: 225,
+		});
+	});
+
 	test("player stays 16:9 when a name strip is reserved", () => {
 		const layout = computeOptimalLayout(3, 400, 900, STRIP);
 		const playerHeight = layout.tileHeight - STRIP;

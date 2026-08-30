@@ -14,6 +14,8 @@ interface StreamGridProps {
 	labelsPinned: boolean;
 }
 
+const LABEL_STRIP_PX = 28;
+
 export function StreamGrid({
 	streams,
 	onRemove,
@@ -43,7 +45,12 @@ export function StreamGrid({
 	}, []);
 
 	const [dragging, setDragging] = useState(false);
-	const layout = computeOptimalLayout(streams.length, size.width, size.height);
+	const layout = computeOptimalLayout(
+		streams.length,
+		size.width,
+		size.height,
+		labelsPinned ? LABEL_STRIP_PX : 0,
+	);
 
 	if (streams.length === 0) {
 		return (
@@ -92,8 +99,6 @@ export function StreamGrid({
 		</div>
 	);
 }
-
-const LABEL_STRIP_PX = 28;
 
 interface StreamCellProps {
 	index: number;

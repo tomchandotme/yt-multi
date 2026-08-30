@@ -24,19 +24,25 @@ export function computeOptimalLayout(
 		const cols = Math.ceil(count / rows);
 		const cellWidth = width / cols;
 		const cellHeight = height / rows;
+		const playerMaxHeight = Math.max(0, cellHeight - chromeHeight);
 
-		let tileWidth = cellWidth;
-		let tileHeight = tileWidth / ASPECT_RATIO;
+		let playerWidth = cellWidth;
+		let playerHeight = playerWidth / ASPECT_RATIO;
 
-		if (tileHeight > cellHeight) {
-			tileHeight = cellHeight;
-			tileWidth = tileHeight * ASPECT_RATIO;
+		if (playerHeight > playerMaxHeight) {
+			playerHeight = playerMaxHeight;
+			playerWidth = playerHeight * ASPECT_RATIO;
 		}
 
-		const area = tileWidth * tileHeight;
+		const area = playerWidth * playerHeight;
 		if (area > bestArea) {
 			bestArea = area;
-			best = { cols, rows, tileWidth, tileHeight };
+			best = {
+				cols,
+				rows,
+				tileWidth: playerWidth,
+				tileHeight: playerHeight + chromeHeight,
+			};
 		}
 	}
 
