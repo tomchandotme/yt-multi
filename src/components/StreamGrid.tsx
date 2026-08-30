@@ -4,9 +4,11 @@ import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface StreamGridProps {
 	streams: string[];
+	onRemove: (videoId: string) => void;
+	onFocusInput: () => void;
 }
 
-export function StreamGrid({ streams }: StreamGridProps) {
+export function StreamGrid({ streams, onRemove, onFocusInput }: StreamGridProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -33,7 +35,13 @@ export function StreamGrid({ streams }: StreamGridProps) {
 	if (streams.length === 0) {
 		return (
 			<div ref={containerRef} className="stream-grid stream-grid--empty">
-				<p className="stream-grid__hint">Add a stream above to begin</p>
+				<button
+					type="button"
+					className="stream-grid__well"
+					onClick={onFocusInput}
+				>
+					Paste a YouTube link
+				</button>
 			</div>
 		);
 	}
@@ -49,6 +57,17 @@ export function StreamGrid({ streams }: StreamGridProps) {
 		>
 			{streams.map((id) => (
 				<div key={id} className="stream-cell">
+					<div className="stream-cell__overlay">
+						<span className="stream-cell__id">{id}</span>
+						<button
+							type="button"
+							className="stream-cell__remove"
+							onClick={() => onRemove(id)}
+							aria-label={`Remove ${id}`}
+						>
+							Remove
+						</button>
+					</div>
 					<YouTubeEmbed
 						videoId={id}
 						width={Math.floor(layout.tileWidth)}

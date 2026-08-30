@@ -1,5 +1,20 @@
 const VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
 
+export type AddAttempt =
+	| { kind: "empty" }
+	| { kind: "invalid" }
+	| { kind: "duplicate"; videoId: string }
+	| { kind: "ok"; videoId: string };
+
+export function attemptAdd(input: string, existing: readonly string[]): AddAttempt {
+	if (!input.trim()) return { kind: "empty" };
+
+	const videoId = parseYouTubeId(input);
+	if (!videoId) return { kind: "invalid" };
+	if (existing.includes(videoId)) return { kind: "duplicate", videoId };
+	return { kind: "ok", videoId };
+}
+
 export function parseYouTubeId(input: string): string | null {
 	const trimmed = input.trim();
 	if (!trimmed) return null;
