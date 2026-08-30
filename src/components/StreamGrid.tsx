@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { computeOptimalLayout } from "../utils/layout";
 import { streamKey, type Stream } from "../utils/stream";
+import { fetchTwitchTitle } from "../utils/twitch";
 import { fetchVideoTitle } from "../utils/youtube";
 import { TwitchEmbed } from "./TwitchEmbed";
 import { YouTubeEmbed } from "./YouTubeEmbed";
-import { BilibiliEmbed } from "./BilibiliEmbed";
 
 interface StreamGridProps {
 	streams: Stream[];
@@ -60,7 +60,7 @@ export function StreamGrid({
 					className="stream-grid__well"
 					onClick={onFocusInput}
 				>
-					Paste a YouTube, Twitch, or Bilibili link
+					Paste a YouTube or Twitch link
 				</button>
 			</div>
 		);
@@ -124,9 +124,12 @@ function StreamCell({
 	const [title, setTitle] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (stream.kind !== "youtube") return;
 		const abort = new AbortController();
-		fetchVideoTitle(stream.id, abort.signal).then((next) => {
+		const pending =
+			stream.kind === "youtube"
+				? fetchVideoTitle(stream.id, abort.signal)
+				: fetchTwitchTitle(stream.id, abort.signal);
+		pending.then((next) => {
 			if (!abort.signal.aborted && next) setTitle(next);
 		});
 		return () => abort.abort();
@@ -242,16 +245,6 @@ function StreamPlayer({
 		return (
 			<TwitchEmbed
 				channel={stream.id}
-				title={title}
-				width={width}
-				height={height}
-			/>
-		);
-	}
-	if (stream.kind === "bilibili") {
-		return (
-			<BilibiliEmbed
-				bvid={stream.id}
 				title={title}
 				width={width}
 				height={height}

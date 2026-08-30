@@ -23,7 +23,7 @@ function messageForAttempt(
 ): string {
 	if (kind === "invalid") return "That isn't a supported link";
 	if (kind === "duplicate") return "Already on the wall";
-	return "Paste a YouTube, Twitch, or Bilibili link";
+	return "Paste a YouTube or Twitch link";
 }
 
 export function StreamBar({
@@ -101,7 +101,7 @@ export function StreamBar({
 						type="text"
 						className="stream-bar__input"
 						aria-label="Stream link"
-						placeholder="Paste a YouTube, Twitch, or Bilibili link"
+						placeholder="Paste a YouTube or Twitch link"
 						value={input}
 						onChange={(e) => {
 							setInput(e.target.value);

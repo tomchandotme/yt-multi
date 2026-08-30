@@ -76,7 +76,11 @@ describe("loadStreams", () => {
 			STORAGE_KEY,
 			JSON.stringify({
 				v: 2,
-				streams: [yt, { kind: "nope", id: "x" }],
+				streams: [
+					yt,
+					{ kind: "nope", id: "x" },
+					{ kind: "bilibili", id: "BV1B7411m7LV" },
+				],
 				savedAt: Date.now() - 1000,
 			}),
 		);
