@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { attemptAdd } from "./youtube";
+import { addStream, attemptAdd } from "./youtube";
 
 const VALID_ID = "dQw4w9WgXcQ";
 
@@ -48,5 +48,24 @@ describe("attemptAdd", () => {
 			kind: "duplicate",
 			videoId: VALID_ID,
 		});
+	});
+});
+
+describe("addStream", () => {
+	test("skip-invalid returns the same array", () => {
+		const existing = [VALID_ID];
+		expect(addStream(existing, "")).toBe(existing);
+		expect(addStream(existing, "not a link")).toBe(existing);
+	});
+
+	test("skip-duplicate returns the same array", () => {
+		const existing = [VALID_ID];
+		expect(addStream(existing, VALID_ID)).toBe(existing);
+		expect(addStream(existing, `https://youtu.be/${VALID_ID}`)).toBe(existing);
+	});
+
+	test("append", () => {
+		expect(addStream([], VALID_ID)).toEqual([VALID_ID]);
+		expect(addStream(["aaaaaaaaaaa"], VALID_ID)).toEqual(["aaaaaaaaaaa", VALID_ID]);
 	});
 });

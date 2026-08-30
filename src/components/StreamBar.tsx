@@ -72,6 +72,7 @@ export function StreamBar({ streams, onAdd, inputRef }: StreamBarProps) {
 						ref={inputRef}
 						type="text"
 						className="stream-bar__input"
+						aria-label="YouTube link"
 						placeholder="Paste a YouTube link"
 						value={input}
 						onChange={(e) => {

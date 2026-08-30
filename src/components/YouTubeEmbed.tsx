@@ -13,6 +13,7 @@ export function YouTubeEmbed({ videoId, width, height }: YouTubeEmbedProps) {
 			height={height}
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 			allowFullScreen
+			tabIndex={-1}
 			style={{ border: "none", display: "block" }}
 		/>
 	);

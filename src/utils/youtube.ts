@@ -15,6 +15,12 @@ export function attemptAdd(input: string, existing: readonly string[]): AddAttem
 	return { kind: "ok", videoId };
 }
 
+export function addStream(existing: string[], videoId: string): string[] {
+	const parsed = parseYouTubeId(videoId);
+	if (!parsed || existing.includes(parsed)) return existing;
+	return [...existing, parsed];
+}
+
 export function parseYouTubeId(input: string): string | null {
 	const trimmed = input.trim();
 	if (!trimmed) return null;

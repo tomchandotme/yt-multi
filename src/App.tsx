@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { StreamBar } from "./components/StreamBar";
 import { StreamGrid } from "./components/StreamGrid";
 import { loadStreams, saveStreams } from "./utils/storage";
+import { addStream } from "./utils/youtube";
 
 function App() {
 	const [streams, setStreams] = useState<string[]>(() => loadStreams());
@@ -12,7 +13,7 @@ function App() {
 	}, [streams]);
 
 	function handleAdd(videoId: string) {
-		setStreams((prev) => [...prev, videoId]);
+		setStreams((prev) => addStream(prev, videoId));
 	}
 
 	function handleRemove(videoId: string) {
