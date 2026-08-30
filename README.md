@@ -1,6 +1,8 @@
 # yt-multi
 
-Watch multiple YouTube streams in one grid. Paste URLs or video IDs, and the layout fills the viewport.
+Watch multiple YouTube videos and Twitch channels in one grid. Paste a link (or a YouTube video ID). The layout fills the leftover viewport with muted autoplay embeds.
+
+The wall lives in this browser for 24 hours. There is no share URL and no backend.
 
 ## Stack
 
@@ -20,6 +22,7 @@ bun run dev
 | Command                | Description                          |
 | ---------------------- | ------------------------------------ |
 | `bun run dev`          | Local dev server                     |
+| `bun test`             | Bun unit tests                       |
 | `bun run build`        | Typecheck and build to `dist/`       |
 | `bun run lint`         | Run oxlint                           |
 | `bun run pages:deploy` | Build and deploy to Cloudflare Pages |
@@ -51,10 +54,13 @@ bun run pages:deploy
 
 ```
 src/
-  App.tsx              # Root state and layout
-  components/          # StreamBar, StreamGrid, YouTubeEmbed
+  App.tsx                 # Streams and Names toggle
+  components/             # StreamBar, StreamGrid, YouTubeEmbed, TwitchEmbed
   utils/
-    youtube.ts         # URL / ID parsing
-    layout.ts          # Grid sizing for 16:9 tiles
-public/                # Static assets, SPA redirects
+    stream.ts             # Stream type, parse, add, reorder
+    youtube.ts            # YouTube ids and titles
+    twitch.ts             # Twitch titles
+    layout.ts             # 16:9 grid sizing
+    storage.ts            # localStorage, 24h TTL
+public/                   # favicon
 ```
