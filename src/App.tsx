@@ -7,7 +7,7 @@ import {
 	saveLabelsPinned,
 	saveStreams,
 } from "./utils/storage";
-import { addStream } from "./utils/youtube";
+import { addStream, moveStream } from "./utils/youtube";
 
 function App() {
 	const [streams, setStreams] = useState<string[]>(() => loadStreams());
@@ -28,6 +28,10 @@ function App() {
 
 	function handleRemove(videoId: string) {
 		setStreams((prev) => prev.filter((id) => id !== videoId));
+	}
+
+	function handleReorder(from: number, to: number) {
+		setStreams((prev) => moveStream(prev, from, to));
 	}
 
 	function handleFocusInput() {
@@ -52,6 +56,7 @@ function App() {
 			<StreamGrid
 				streams={streams}
 				onRemove={handleRemove}
+				onReorder={handleReorder}
 				onFocusInput={handleFocusInput}
 				labelsPinned={labelsPinned}
 			/>

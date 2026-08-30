@@ -348,6 +348,44 @@ body {
 	}
 }
 
+.stream-grid--dragging iframe {
+	pointer-events: none;
+}
+
+.stream-cell__handle {
+	flex-shrink: 0;
+	padding: 0 var(--space-1);
+	border: 1px solid transparent;
+	border-radius: 0;
+	background: transparent;
+	color: var(--color-text-muted);
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+	line-height: 1;
+	cursor: grab;
+	pointer-events: none;
+}
+
+.stream-cell__handle:focus-visible {
+	outline: 1px solid var(--color-text-strong);
+	outline-offset: 2px;
+}
+
+.stream-cell:hover .stream-cell__handle,
+.stream-cell:focus-within .stream-cell__handle {
+	pointer-events: auto;
+}
+
+.stream-grid--labels .stream-cell__handle {
+	pointer-events: auto;
+}
+
+@media (hover: none) {
+	.stream-cell__handle {
+		pointer-events: auto;
+	}
+}
+
 .stream-cell__title {
 	min-width: 0;
 	flex: 1;

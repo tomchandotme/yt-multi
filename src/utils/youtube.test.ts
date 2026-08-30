@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { addStream, attemptAdd, parseOEmbedTitle } from "./youtube";
+import { addStream, attemptAdd, moveStream, parseOEmbedTitle } from "./youtube";
 
 const VALID_ID = "dQw4w9WgXcQ";
 
@@ -67,6 +67,29 @@ describe("addStream", () => {
 	test("append", () => {
 		expect(addStream([], VALID_ID)).toEqual([VALID_ID]);
 		expect(addStream(["aaaaaaaaaaa"], VALID_ID)).toEqual(["aaaaaaaaaaa", VALID_ID]);
+	});
+});
+
+describe("moveStream", () => {
+	const a = "aaaaaaaaaaa";
+	const b = "bbbbbbbbbbb";
+	const c = "ccccccccccc";
+
+	test("swaps by index", () => {
+		expect(moveStream([a, b, c], 0, 2)).toEqual([b, c, a]);
+		expect(moveStream([a, b, c], 2, 0)).toEqual([c, a, b]);
+	});
+
+	test("same index returns the same array", () => {
+		const existing = [a, b];
+		expect(moveStream(existing, 0, 0)).toBe(existing);
+	});
+
+	test("out of range returns the same array", () => {
+		const existing = [a, b];
+		expect(moveStream(existing, -1, 0)).toBe(existing);
+		expect(moveStream(existing, 0, 2)).toBe(existing);
+		expect(moveStream(existing, 2, 0)).toBe(existing);
 	});
 });
 
