@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StreamBar } from "./components/StreamBar";
 import { StreamGrid } from "./components/StreamGrid";
+import { loadStreams, saveStreams } from "./utils/storage";
 
 function App() {
-	const [streams, setStreams] = useState<string[]>([]);
+	const [streams, setStreams] = useState<string[]>(() => loadStreams());
+
+	useEffect(() => {
+		saveStreams(streams);
+	}, [streams]);
 
 	function handleAdd(videoId: string) {
 		setStreams((prev) => [...prev, videoId]);

@@ -9,6 +9,7 @@
 		"build": "tsc -b && vite build",
 		"deploy": "wrangler deploy",
 		"lint": "oxlint",
+		"test": "bun test",
 		"preview": "vite preview",
 		"pages:build": "bun run build",
 		"pages:deploy": "bun run pages:build && wrangler pages deploy dist --project-name=yt-multi",
