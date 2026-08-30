@@ -100,6 +100,32 @@ body {
 	text-transform: lowercase;
 }
 
+.stream-bar__clear {
+	padding: var(--space-1) var(--space-2);
+	border: 1px solid var(--color-border);
+	border-radius: 0;
+	background: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-sans);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	cursor: pointer;
+	transition:
+		background var(--transition-fast),
+		border-color var(--transition-fast),
+		color var(--transition-fast);
+}
+
+.stream-bar__clear:hover {
+	border-color: var(--color-accent);
+	color: var(--color-text-strong);
+}
+
+.stream-bar__clear:focus-visible {
+	outline: 1px solid var(--color-text-strong);
+	outline-offset: 2px;
+}
+
 .stream-bar__form {
 	display: flex;
 	flex: 1;

@@ -4,6 +4,7 @@ import { attemptAdd, parseYouTubeId } from "../utils/youtube";
 interface StreamBarProps {
 	streams: string[];
 	onAdd: (videoId: string) => void;
+	onClear: () => void;
 	inputRef: Ref<HTMLInputElement>;
 }
 
@@ -23,7 +24,7 @@ function messageForAttempt(
 	return "Paste a YouTube link";
 }
 
-export function StreamBar({ streams, onAdd, inputRef }: StreamBarProps) {
+export function StreamBar({ streams, onAdd, onClear, inputRef }: StreamBarProps) {
 	const [input, setInput] = useState("");
 	const [error, setError] = useState("");
 
@@ -67,6 +68,16 @@ export function StreamBar({ streams, onAdd, inputRef }: StreamBarProps) {
 						{streams.length} on air
 					</span>
 				</div>
+				{streams.length > 0 ? (
+					<button
+						type="button"
+						className="stream-bar__clear"
+						onClick={onClear}
+						aria-label="Clear all streams"
+					>
+						Clear
+					</button>
+				) : null}
 				<form className="stream-bar__form" onSubmit={handleSubmit}>
 					<input
 						ref={inputRef}
