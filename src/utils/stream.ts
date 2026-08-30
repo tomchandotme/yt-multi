@@ -15,9 +15,12 @@ const TWITCH_SKIP = new Set([
 	"turbo",
 ]);
 
+const BVID = /^BV[0-9A-Za-z]{10}$/;
+
 export type Stream =
 	| { kind: "youtube"; id: string }
-	| { kind: "twitch"; id: string };
+	| { kind: "twitch"; id: string }
+	| { kind: "bilibili"; id: string };
 
 export type AddAttempt =
 	| { kind: "empty" }
@@ -36,9 +39,11 @@ export function sameStream(a: Stream, b: Stream): boolean {
 export function parseStream(input: string): Stream | null {
 	const twitch = parseTwitchChannel(input);
 	if (twitch) return { kind: "twitch", id: twitch };
-	const id = parseYouTubeId(input);
-	if (!id) return null;
-	return { kind: "youtube", id };
+	const youtubeId = parseYouTubeId(input);
+	if (youtubeId) return { kind: "youtube", id: youtubeId };
+	const bvid = parseBilibiliId(input);
+	if (bvid) return { kind: "bilibili", id: bvid };
+	return null;
 }
 
 export function isStream(value: unknown): value is Stream {
@@ -49,6 +54,9 @@ export function isStream(value: unknown): value is Stream {
 	}
 	if (record.kind === "twitch") {
 		return typeof record.id === "string" && TWITCH_CHANNEL.test(record.id);
+	}
+	if (record.kind === "bilibili") {
+		return typeof record.id === "string" && BVID.test(record.id);
 	}
 	return false;
 }
@@ -67,6 +75,28 @@ export function parseTwitchChannel(input: string): string | null {
 		if (!channel || TWITCH_SKIP.has(channel)) return null;
 		if (channel.startsWith("videos")) return null;
 		return TWITCH_CHANNEL.test(channel) ? channel : null;
+	} catch {
+		return null;
+	}
+}
+
+export function parseBilibiliId(input: string): string | null {
+	const trimmed = input.trim();
+	if (!trimmed) return null;
+	if (BVID.test(trimmed)) return trimmed;
+	try {
+		const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+		const host = url.hostname.replace(/^www\./, "");
+		if (host === "live.bilibili.com") return null;
+		if (host !== "bilibili.com" && host !== "m.bilibili.com" && host !== "b23.tv") {
+			return null;
+		}
+		if (host === "b23.tv") return null;
+		const parts = url.pathname.split("/").filter(Boolean);
+		const videoIndex = parts.indexOf("video");
+		if (videoIndex === -1 || !parts[videoIndex + 1]) return null;
+		const id = parts[videoIndex + 1];
+		return BVID.test(id) ? id : null;
 	} catch {
 		return null;
 	}

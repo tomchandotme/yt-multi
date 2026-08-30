@@ -18,7 +18,11 @@ describe("parseStream", () => {
 			kind: "twitch",
 			id: "twitch",
 		});
-		expect(parseStream("https://www.bilibili.com/video/BV1B7411m7LV")).toBeNull();
+		expect(parseStream("https://www.bilibili.com/video/BV1B7411m7LV")).toEqual({
+			kind: "bilibili",
+			id: "BV1B7411m7LV",
+		});
+		expect(parseStream("https://live.bilibili.com/1")).toBeNull();
 		expect(parseStream("https://www.twitch.tv/videos/123")).toBeNull();
 		expect(parseStream("https://clips.twitch.tv/SomeClip")).toBeNull();
 	});
@@ -28,6 +32,7 @@ describe("isStream", () => {
 	test("accepts youtube and twitch", () => {
 		expect(isStream(yt)).toBe(true);
 		expect(isStream({ kind: "twitch", id: "twitch" })).toBe(true);
+		expect(isStream({ kind: "bilibili", id: "BV1B7411m7LV" })).toBe(true);
 		expect(isStream({ kind: "youtube", id: "nope" })).toBe(false);
 	});
 });
