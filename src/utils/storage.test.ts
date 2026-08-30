@@ -8,6 +8,7 @@ import {
 
 const STORAGE_KEY = "yt-multi:streams";
 const VALID_ID = "dQw4w9WgXcQ";
+const yt = { kind: "youtube" as const, id: VALID_ID };
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 const memory = new Map<string, string>();
@@ -59,7 +60,7 @@ describe("loadStreams", () => {
 		expect(memory.has(STORAGE_KEY)).toBe(false);
 	});
 
-	test("loads valid ids saved within 24 hours", () => {
+	test("migrates v1 string ids", () => {
 		memory.set(
 			STORAGE_KEY,
 			JSON.stringify({
@@ -67,14 +68,28 @@ describe("loadStreams", () => {
 				savedAt: Date.now() - 1000,
 			}),
 		);
-		expect(loadStreams()).toEqual([VALID_ID, VALID_ID]);
+		expect(loadStreams()).toEqual([yt, yt]);
+	});
+
+	test("loads v2 streams and drops unknown kinds", () => {
+		memory.set(
+			STORAGE_KEY,
+			JSON.stringify({
+				v: 2,
+				streams: [yt, { kind: "twitch", id: "twitch" }],
+				savedAt: Date.now() - 1000,
+			}),
+		);
+		expect(loadStreams()).toEqual([yt]);
 	});
 });
 
 describe("saveStreams", () => {
-	test("round-trips ids through loadStreams", () => {
-		saveStreams([VALID_ID]);
-		expect(loadStreams()).toEqual([VALID_ID]);
+	test("round-trips ids through loadStreams as v2", () => {
+		saveStreams([yt]);
+		expect(loadStreams()).toEqual([yt]);
+		const raw = JSON.parse(memory.get(STORAGE_KEY) ?? "{}") as { v?: number };
+		expect(raw.v).toBe(2);
 	});
 });
 
@@ -92,8 +107,8 @@ describe("labels pinned", () => {
 
 	test("does not share the streams key", () => {
 		saveLabelsPinned(false);
-		saveStreams([VALID_ID]);
+		saveStreams([yt]);
 		expect(loadLabelsPinned()).toBe(false);
-		expect(loadStreams()).toEqual([VALID_ID]);
+		expect(loadStreams()).toEqual([yt]);
 	});
 });

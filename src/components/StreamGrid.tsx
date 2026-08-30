@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { computeOptimalLayout } from "../utils/layout";
+import { streamKey, type Stream } from "../utils/stream";
 import { fetchVideoTitle } from "../utils/youtube";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface StreamGridProps {
-	streams: string[];
-	onRemove: (videoId: string) => void;
+	streams: Stream[];
+	onRemove: (stream: Stream) => void;
 	onReorder: (from: number, to: number) => void;
 	onFocusInput: () => void;
 	labelsPinned: boolean;
@@ -73,11 +74,11 @@ export function StreamGrid({
 				gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
 			}}
 		>
-			{streams.map((id, index) => (
+			{streams.map((stream, index) => (
 				<StreamCell
-					key={id}
+					key={streamKey(stream)}
 					index={index}
-					videoId={id}
+					stream={stream}
 					width={Math.floor(layout.tileWidth)}
 					height={Math.floor(layout.tileHeight)}
 					onRemove={onRemove}
@@ -91,17 +92,17 @@ export function StreamGrid({
 
 interface StreamCellProps {
 	index: number;
-	videoId: string;
+	stream: Stream;
 	width: number;
 	height: number;
-	onRemove: (videoId: string) => void;
+	onRemove: (stream: Stream) => void;
 	onReorder: (from: number, to: number) => void;
 	onDragActive: (active: boolean) => void;
 }
 
 function StreamCell({
 	index,
-	videoId,
+	stream,
 	width,
 	height,
 	onRemove,
@@ -112,13 +113,13 @@ function StreamCell({
 
 	useEffect(() => {
 		const abort = new AbortController();
-		fetchVideoTitle(videoId, abort.signal).then((next) => {
+		fetchVideoTitle(stream.id, abort.signal).then((next) => {
 			if (!abort.signal.aborted && next) setTitle(next);
 		});
 		return () => abort.abort();
-	}, [videoId]);
+	}, [stream.id]);
 
-	const label = title ?? videoId;
+	const label = title ?? stream.id;
 
 	function handleDragStart(event: DragEvent<HTMLButtonElement>) {
 		event.dataTransfer.setData("text/plain", String(index));
@@ -179,14 +180,14 @@ function StreamCell({
 				<button
 					type="button"
 					className="stream-cell__remove"
-					onClick={() => onRemove(videoId)}
+					onClick={() => onRemove(stream)}
 					aria-label={`Remove ${label}`}
 				>
 					Remove
 				</button>
 			</div>
 			<YouTubeEmbed
-				videoId={videoId}
+				videoId={stream.id}
 				title={label}
 				width={width}
 				height={height}

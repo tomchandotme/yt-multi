@@ -1,38 +1,39 @@
-import { parseYouTubeId } from "./youtube";
+import { isStream, parseStream, type Stream } from "./stream";
 
 const STORAGE_KEY = "yt-multi:streams";
 const LABELS_KEY = "yt-multi:labels-pinned";
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
-type StoredStreams = {
-	streams: string[];
+type StoredV2 = {
+	v: 2;
+	streams: Stream[];
 	savedAt: number;
 };
 
-export function loadStreams(): string[] {
+export function loadStreams(): Stream[] {
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
 		if (!raw) return [];
 
 		const parsed: unknown = JSON.parse(raw);
-		if (!isStoredStreams(parsed)) return [];
+		const savedAt = readSavedAt(parsed);
+		if (savedAt === null) return [];
 
-		if (Date.now() - parsed.savedAt > MAX_AGE_MS) {
+		if (Date.now() - savedAt > MAX_AGE_MS) {
 			localStorage.removeItem(STORAGE_KEY);
 			return [];
 		}
 
-		return parsed.streams
-			.map((id) => parseYouTubeId(id))
-			.filter((id): id is string => id !== null);
+		return readStreams(parsed);
 	} catch {
 		return [];
 	}
 }
 
-export function saveStreams(streams: string[]): void {
+export function saveStreams(streams: Stream[]): void {
 	try {
-		const payload: StoredStreams = {
+		const payload: StoredV2 = {
+			v: 2,
 			streams,
 			savedAt: Date.now(),
 		};
@@ -61,12 +62,22 @@ export function saveLabelsPinned(pinned: boolean): void {
 	}
 }
 
-function isStoredStreams(value: unknown): value is StoredStreams {
-	if (typeof value !== "object" || value === null) return false;
+function readSavedAt(value: unknown): number | null {
+	if (typeof value !== "object" || value === null) return null;
+	const savedAt = (value as Record<string, unknown>).savedAt;
+	return Number.isFinite(savedAt) ? Number(savedAt) : null;
+}
+
+function readStreams(value: unknown): Stream[] {
+	if (typeof value !== "object" || value === null) return [];
 	const record = value as Record<string, unknown>;
-	return (
-		Number.isFinite(record.savedAt) &&
-		Array.isArray(record.streams) &&
-		record.streams.every((id) => typeof id === "string")
-	);
+	if (!Array.isArray(record.streams)) return [];
+
+	if (record.v === 2) {
+		return record.streams.filter(isStream);
+	}
+
+	return record.streams
+		.map((id) => (typeof id === "string" ? parseStream(id) : null))
+		.filter((stream): stream is Stream => stream !== null);
 }
