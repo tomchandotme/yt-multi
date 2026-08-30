@@ -76,7 +76,7 @@ describe("loadStreams", () => {
 			STORAGE_KEY,
 			JSON.stringify({
 				v: 2,
-				streams: [yt, { kind: "twitch", id: "twitch" }],
+				streams: [yt, { kind: "nope", id: "x" }],
 				savedAt: Date.now() - 1000,
 			}),
 		);

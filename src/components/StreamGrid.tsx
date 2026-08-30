@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 
 import { computeOptimalLayout } from "../utils/layout";
 import { streamKey, type Stream } from "../utils/stream";
 import { fetchVideoTitle } from "../utils/youtube";
+import { TwitchEmbed } from "./TwitchEmbed";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface StreamGridProps {
@@ -51,7 +52,7 @@ export function StreamGrid({
 					className="stream-grid__well"
 					onClick={onFocusInput}
 				>
-					Paste a YouTube link
+					Paste a YouTube or Twitch link
 				</button>
 			</div>
 		);
@@ -112,12 +113,13 @@ function StreamCell({
 	const [title, setTitle] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (stream.kind !== "youtube") return;
 		const abort = new AbortController();
 		fetchVideoTitle(stream.id, abort.signal).then((next) => {
 			if (!abort.signal.aborted && next) setTitle(next);
 		});
 		return () => abort.abort();
-	}, [stream.id]);
+	}, [stream]);
 
 	const label = title ?? stream.id;
 
@@ -186,12 +188,42 @@ function StreamCell({
 					Remove
 				</button>
 			</div>
+			<StreamPlayer stream={stream} title={label} width={width} height={height} />
+		</div>
+	);
+}
+
+function StreamPlayer({
+	stream,
+	title,
+	width,
+	height,
+}: {
+	stream: Stream;
+	title: string;
+	width: number;
+	height: number;
+}) {
+	if (stream.kind === "youtube") {
+		return (
 			<YouTubeEmbed
 				videoId={stream.id}
-				title={label}
+				title={title}
 				width={width}
 				height={height}
 			/>
-		</div>
-	);
+		);
+	}
+	if (stream.kind === "twitch") {
+		return (
+			<TwitchEmbed
+				channel={stream.id}
+				title={title}
+				width={width}
+				height={height}
+			/>
+		);
+	}
+	const _never: never = stream;
+	return _never;
 }

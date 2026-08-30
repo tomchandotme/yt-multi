@@ -14,15 +14,20 @@ describe("parseStream", () => {
 	test("youtube urls", () => {
 		expect(parseStream(VALID_ID)).toEqual(yt);
 		expect(parseStream(`https://youtu.be/${VALID_ID}`)).toEqual(yt);
-		expect(parseStream("https://twitch.tv/twitch")).toBeNull();
+		expect(parseStream("https://twitch.tv/twitch")).toEqual({
+			kind: "twitch",
+			id: "twitch",
+		});
 		expect(parseStream("https://www.bilibili.com/video/BV1B7411m7LV")).toBeNull();
+		expect(parseStream("https://www.twitch.tv/videos/123")).toBeNull();
+		expect(parseStream("https://clips.twitch.tv/SomeClip")).toBeNull();
 	});
 });
 
 describe("isStream", () => {
-	test("accepts youtube only", () => {
+	test("accepts youtube and twitch", () => {
 		expect(isStream(yt)).toBe(true);
-		expect(isStream({ kind: "twitch", id: "twitch" })).toBe(false);
+		expect(isStream({ kind: "twitch", id: "twitch" })).toBe(true);
 		expect(isStream({ kind: "youtube", id: "nope" })).toBe(false);
 	});
 });
@@ -42,7 +47,10 @@ describe("attemptAdd", () => {
 		expect(attemptAdd("https://example.com/watch?v=nope", [])).toEqual({
 			kind: "invalid",
 		});
-		expect(attemptAdd("https://twitch.tv/twitch", [])).toEqual({ kind: "invalid" });
+		expect(attemptAdd("https://twitch.tv/twitch", [])).toEqual({
+			kind: "ok",
+			stream: { kind: "twitch", id: "twitch" },
+		});
 	});
 });
 
