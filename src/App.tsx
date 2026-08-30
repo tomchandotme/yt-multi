@@ -24,9 +24,19 @@ function App() {
 		inputRef.current?.focus();
 	}
 
+	function handleClear() {
+		setStreams([]);
+		handleFocusInput();
+	}
+
 	return (
 		<div className="app">
-			<StreamBar streams={streams} onAdd={handleAdd} inputRef={inputRef} />
+			<StreamBar
+				streams={streams}
+				onAdd={handleAdd}
+				onClear={handleClear}
+				inputRef={inputRef}
+			/>
 			<StreamGrid
 				streams={streams}
 				onRemove={handleRemove}
