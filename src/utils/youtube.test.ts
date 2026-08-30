@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { addStream, attemptAdd } from "./youtube";
+import { addStream, attemptAdd, parseOEmbedTitle } from "./youtube";
 
 const VALID_ID = "dQw4w9WgXcQ";
 
@@ -67,5 +67,18 @@ describe("addStream", () => {
 	test("append", () => {
 		expect(addStream([], VALID_ID)).toEqual([VALID_ID]);
 		expect(addStream(["aaaaaaaaaaa"], VALID_ID)).toEqual(["aaaaaaaaaaa", VALID_ID]);
+	});
+});
+
+describe("parseOEmbedTitle", () => {
+	test("reads a non-empty title string", () => {
+		expect(parseOEmbedTitle({ title: "  LEC vs LCK  " })).toBe("LEC vs LCK");
+	});
+
+	test("rejects missing or blank titles", () => {
+		expect(parseOEmbedTitle(null)).toBeNull();
+		expect(parseOEmbedTitle({})).toBeNull();
+		expect(parseOEmbedTitle({ title: 1 })).toBeNull();
+		expect(parseOEmbedTitle({ title: "   " })).toBeNull();
 	});
 });

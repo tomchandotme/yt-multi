@@ -61,3 +61,40 @@ export function parseYouTubeId(input: string): string | null {
 
 	return null;
 }
+
+const titleCache = new Map<string, string>();
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null;
+}
+
+export function parseOEmbedTitle(value: unknown): string | null {
+	if (!isRecord(value)) return null;
+	if (typeof value.title !== "string") return null;
+	const title = value.title.trim();
+	return title.length > 0 ? title : null;
+}
+
+export async function fetchVideoTitle(
+	videoId: string,
+	signal?: AbortSignal,
+): Promise<string | null> {
+	const parsed = parseYouTubeId(videoId);
+	if (!parsed) return null;
+
+	const cached = titleCache.get(parsed);
+	if (cached !== undefined) return cached;
+
+	const watchUrl = `https://www.youtube.com/watch?v=${parsed}`;
+	const endpoint = `https://noembed.com/embed?url=${encodeURIComponent(watchUrl)}`;
+
+	try {
+		const response = await fetch(endpoint, { signal });
+		if (!response.ok) return null;
+		const title = parseOEmbedTitle(await response.json());
+		if (title) titleCache.set(parsed, title);
+		return title;
+	} catch {
+		return null;
+	}
+}

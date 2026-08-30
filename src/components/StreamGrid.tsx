@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { computeOptimalLayout } from "../utils/layout";
+import { fetchVideoTitle } from "../utils/youtube";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface StreamGridProps {
@@ -56,25 +57,59 @@ export function StreamGrid({ streams, onRemove, onFocusInput }: StreamGridProps)
 			}}
 		>
 			{streams.map((id) => (
-				<div key={id} className="stream-cell">
-					<div className="stream-cell__overlay">
-						<span className="stream-cell__id">{id}</span>
-						<button
-							type="button"
-							className="stream-cell__remove"
-							onClick={() => onRemove(id)}
-							aria-label={`Remove ${id}`}
-						>
-							Remove
-						</button>
-					</div>
-					<YouTubeEmbed
-						videoId={id}
-						width={Math.floor(layout.tileWidth)}
-						height={Math.floor(layout.tileHeight)}
-					/>
-				</div>
+				<StreamCell
+					key={id}
+					videoId={id}
+					width={Math.floor(layout.tileWidth)}
+					height={Math.floor(layout.tileHeight)}
+					onRemove={onRemove}
+				/>
 			))}
+		</div>
+	);
+}
+
+interface StreamCellProps {
+	videoId: string;
+	width: number;
+	height: number;
+	onRemove: (videoId: string) => void;
+}
+
+function StreamCell({ videoId, width, height, onRemove }: StreamCellProps) {
+	const [title, setTitle] = useState<string | null>(null);
+
+	useEffect(() => {
+		const abort = new AbortController();
+		fetchVideoTitle(videoId, abort.signal).then((next) => {
+			if (!abort.signal.aborted && next) setTitle(next);
+		});
+		return () => abort.abort();
+	}, [videoId]);
+
+	const label = title ?? videoId;
+
+	return (
+		<div className="stream-cell">
+			<div className="stream-cell__overlay">
+				<span className="stream-cell__title" title={label}>
+					{label}
+				</span>
+				<button
+					type="button"
+					className="stream-cell__remove"
+					onClick={() => onRemove(videoId)}
+					aria-label={`Remove ${label}`}
+				>
+					Remove
+				</button>
+			</div>
+			<YouTubeEmbed
+				videoId={videoId}
+				title={label}
+				width={width}
+				height={height}
+			/>
 		</div>
 	);
 }
