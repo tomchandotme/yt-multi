@@ -288,15 +288,22 @@ body {
 	}
 }
 
-.stream-cell__id {
-	font-family: var(--font-mono);
+.stream-cell__title {
+	min-width: 0;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: var(--font-sans);
 	font-size: var(--text-sm);
+	font-weight: 500;
 	color: var(--color-text-strong);
-	letter-spacing: 0.02em;
+	letter-spacing: 0.01em;
 }
 
 .stream-cell__remove {
 	margin-left: auto;
+	flex-shrink: 0;
 	padding: var(--space-1) var(--space-2);
 	border: 1px solid var(--color-border);
 	border-radius: 0;
