@@ -4,6 +4,7 @@ import { streamKey, type Stream } from "../utils/stream";
 import { fetchVideoTitle } from "../utils/youtube";
 import { TwitchEmbed } from "./TwitchEmbed";
 import { YouTubeEmbed } from "./YouTubeEmbed";
+import { BilibiliEmbed } from "./BilibiliEmbed";
 
 interface StreamGridProps {
 	streams: Stream[];
@@ -52,7 +53,7 @@ export function StreamGrid({
 					className="stream-grid__well"
 					onClick={onFocusInput}
 				>
-					Paste a YouTube or Twitch link
+					Paste a YouTube, Twitch, or Bilibili link
 				</button>
 			</div>
 		);
@@ -218,6 +219,16 @@ function StreamPlayer({
 		return (
 			<TwitchEmbed
 				channel={stream.id}
+				title={title}
+				width={width}
+				height={height}
+			/>
+		);
+	}
+	if (stream.kind === "bilibili") {
+		return (
+			<BilibiliEmbed
+				bvid={stream.id}
 				title={title}
 				width={width}
 				height={height}
