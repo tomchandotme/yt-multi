@@ -5,6 +5,8 @@ interface StreamBarProps {
 	streams: string[];
 	onAdd: (videoId: string) => void;
 	onClear: () => void;
+	labelsPinned: boolean;
+	onToggleLabels: () => void;
 	inputRef: Ref<HTMLInputElement>;
 }
 
@@ -24,7 +26,14 @@ function messageForAttempt(
 	return "Paste a YouTube link";
 }
 
-export function StreamBar({ streams, onAdd, onClear, inputRef }: StreamBarProps) {
+export function StreamBar({
+	streams,
+	onAdd,
+	onClear,
+	labelsPinned,
+	onToggleLabels,
+	inputRef,
+}: StreamBarProps) {
 	const [input, setInput] = useState("");
 	const [error, setError] = useState("");
 
@@ -68,6 +77,14 @@ export function StreamBar({ streams, onAdd, onClear, inputRef }: StreamBarProps)
 						{streams.length} on air
 					</span>
 				</div>
+				<button
+					type="button"
+					className="stream-bar__names"
+					aria-pressed={labelsPinned}
+					onClick={onToggleLabels}
+				>
+					Names
+				</button>
 				{streams.length > 0 ? (
 					<button
 						type="button"

@@ -7,9 +7,15 @@ interface StreamGridProps {
 	streams: string[];
 	onRemove: (videoId: string) => void;
 	onFocusInput: () => void;
+	labelsPinned: boolean;
 }
 
-export function StreamGrid({ streams, onRemove, onFocusInput }: StreamGridProps) {
+export function StreamGrid({
+	streams,
+	onRemove,
+	onFocusInput,
+	labelsPinned,
+}: StreamGridProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -50,7 +56,9 @@ export function StreamGrid({ streams, onRemove, onFocusInput }: StreamGridProps)
 	return (
 		<div
 			ref={containerRef}
-			className="stream-grid"
+			className={
+				labelsPinned ? "stream-grid stream-grid--labels" : "stream-grid"
+			}
 			style={{
 				gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
 				gridTemplateRows: `repeat(${layout.rows}, 1fr)`,

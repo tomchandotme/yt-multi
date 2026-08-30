@@ -1,6 +1,7 @@
 import { parseYouTubeId } from "./youtube";
 
 const STORAGE_KEY = "yt-multi:streams";
+const LABELS_KEY = "yt-multi:labels-pinned";
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 type StoredStreams = {
@@ -36,6 +37,25 @@ export function saveStreams(streams: string[]): void {
 			savedAt: Date.now(),
 		};
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+	} catch {
+		// quota exceeded or storage disabled
+	}
+}
+
+export function loadLabelsPinned(): boolean {
+	try {
+		const raw = localStorage.getItem(LABELS_KEY);
+		if (raw === "0") return false;
+		if (raw === "1") return true;
+		return true;
+	} catch {
+		return true;
+	}
+}
+
+export function saveLabelsPinned(pinned: boolean): void {
+	try {
+		localStorage.setItem(LABELS_KEY, pinned ? "1" : "0");
 	} catch {
 		// quota exceeded or storage disabled
 	}
