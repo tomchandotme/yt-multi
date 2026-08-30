@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { loadStreams, saveStreams } from "./storage";
+import {
+	loadLabelsPinned,
+	loadStreams,
+	saveLabelsPinned,
+	saveStreams,
+} from "./storage";
 
 const STORAGE_KEY = "yt-multi:streams";
 const VALID_ID = "dQw4w9WgXcQ";
@@ -69,6 +74,26 @@ describe("loadStreams", () => {
 describe("saveStreams", () => {
 	test("round-trips ids through loadStreams", () => {
 		saveStreams([VALID_ID]);
+		expect(loadStreams()).toEqual([VALID_ID]);
+	});
+});
+
+describe("labels pinned", () => {
+	test("defaults on when nothing is stored", () => {
+		expect(loadLabelsPinned()).toBe(true);
+	});
+
+	test("round-trips off and on", () => {
+		saveLabelsPinned(false);
+		expect(loadLabelsPinned()).toBe(false);
+		saveLabelsPinned(true);
+		expect(loadLabelsPinned()).toBe(true);
+	});
+
+	test("does not share the streams key", () => {
+		saveLabelsPinned(false);
+		saveStreams([VALID_ID]);
+		expect(loadLabelsPinned()).toBe(false);
 		expect(loadStreams()).toEqual([VALID_ID]);
 	});
 });
