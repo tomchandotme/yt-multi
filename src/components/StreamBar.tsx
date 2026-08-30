@@ -21,9 +21,9 @@ function isEditableTarget(target: EventTarget | null): boolean {
 function messageForAttempt(
 	kind: "empty" | "invalid" | "duplicate",
 ): string {
-	if (kind === "invalid") return "That isn't a YouTube link";
+	if (kind === "invalid") return "That isn't a supported link";
 	if (kind === "duplicate") return "Already on the wall";
-	return "Paste a YouTube link";
+	return "Paste a YouTube or Twitch link";
 }
 
 export function StreamBar({
@@ -100,8 +100,8 @@ export function StreamBar({
 						ref={inputRef}
 						type="text"
 						className="stream-bar__input"
-						aria-label="YouTube link"
-						placeholder="Paste a YouTube link"
+						aria-label="Stream link"
+						placeholder="Paste a YouTube or Twitch link"
 						value={input}
 						onChange={(e) => {
 							setInput(e.target.value);
