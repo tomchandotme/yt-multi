@@ -83,6 +83,7 @@ export function StreamGrid({
 					stream={stream}
 					width={Math.floor(layout.tileWidth)}
 					height={Math.floor(layout.tileHeight)}
+					labelsPinned={labelsPinned}
 					onRemove={onRemove}
 					onReorder={onReorder}
 					onDragActive={setDragging}
@@ -92,11 +93,14 @@ export function StreamGrid({
 	);
 }
 
+const LABEL_STRIP_PX = 28;
+
 interface StreamCellProps {
 	index: number;
 	stream: Stream;
 	width: number;
 	height: number;
+	labelsPinned: boolean;
 	onRemove: (stream: Stream) => void;
 	onReorder: (from: number, to: number) => void;
 	onDragActive: (active: boolean) => void;
@@ -107,6 +111,7 @@ function StreamCell({
 	stream,
 	width,
 	height,
+	labelsPinned,
 	onRemove,
 	onReorder,
 	onDragActive,
@@ -123,6 +128,9 @@ function StreamCell({
 	}, [stream]);
 
 	const label = title ?? stream.id;
+	const playerHeight = labelsPinned
+		? Math.max(1, height - LABEL_STRIP_PX)
+		: height;
 
 	function handleDragStart(event: DragEvent<HTMLButtonElement>) {
 		event.dataTransfer.setData("text/plain", String(index));
@@ -165,31 +173,41 @@ function StreamCell({
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}
 		>
-			<div className="stream-cell__overlay">
-				<button
-					type="button"
-					className="stream-cell__handle"
-					draggable
-					aria-label={`Move ${label}`}
-					onDragStart={handleDragStart}
-					onDragEnd={handleDragEnd}
-					onKeyDown={handleHandleKey}
-				>
-					::
-				</button>
-				<span className="stream-cell__title" title={label}>
-					{label}
-				</span>
-				<button
-					type="button"
-					className="stream-cell__remove"
-					onClick={() => onRemove(stream)}
-					aria-label={`Remove ${label}`}
-				>
-					Remove
-				</button>
+			<div
+				className="stream-cell__frame"
+				style={{ width, height }}
+			>
+				<div className="stream-cell__overlay">
+					<button
+						type="button"
+						className="stream-cell__handle"
+						draggable
+						aria-label={`Move ${label}`}
+						onDragStart={handleDragStart}
+						onDragEnd={handleDragEnd}
+						onKeyDown={handleHandleKey}
+					>
+						::
+					</button>
+					<span className="stream-cell__title" title={label}>
+						{label}
+					</span>
+					<button
+						type="button"
+						className="stream-cell__remove"
+						onClick={() => onRemove(stream)}
+						aria-label={`Remove ${label}`}
+					>
+						Remove
+					</button>
+				</div>
+				<StreamPlayer
+					stream={stream}
+					title={label}
+					width={width}
+					height={playerHeight}
+				/>
 			</div>
-			<StreamPlayer stream={stream} title={label} width={width} height={height} />
 		</div>
 	);
 }

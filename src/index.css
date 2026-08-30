@@ -279,12 +279,17 @@ body {
 }
 
 .stream-cell {
-	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
 	background: var(--color-bg);
+}
+
+.stream-cell__frame {
+	position: relative;
+	flex-shrink: 0;
+	overflow: hidden;
 }
 
 .stream-cell__overlay {
@@ -322,13 +327,21 @@ body {
 	}
 }
 
+.stream-grid--labels .stream-cell__frame {
+	display: flex;
+	flex-direction: column;
+}
+
 .stream-grid--labels .stream-cell__overlay {
-	inset: 0 0 auto;
+	position: relative;
+	inset: auto;
+	flex-shrink: 0;
 	height: 28px;
 	align-items: center;
 	padding: var(--space-1) var(--space-2);
 	background: var(--color-bg);
 	opacity: 1;
+	pointer-events: none;
 }
 
 .stream-grid--labels .stream-cell__remove {
