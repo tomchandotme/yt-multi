@@ -108,7 +108,7 @@ export function StreamBar({
 							if (error) setError("");
 						}}
 						onPaste={(event) => {
-							const text = event.clipboardData.getData("text");
+							const text = event.clipboardData?.getData("text") ?? "";
 							if (!parseStream(text)) return;
 							event.preventDefault();
 							applyAdd(text);

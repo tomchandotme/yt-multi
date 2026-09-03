@@ -1,5 +1,20 @@
 const VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
 
+const YOUTUBE_HOSTS = new Set([
+	"youtube.com",
+	"m.youtube.com",
+	"music.youtube.com",
+	"youtube-nocookie.com",
+]);
+
+function youtubeIdFromPath(pathParts: string[], marker: string): string | null {
+	const index = pathParts.indexOf(marker);
+	if (index === -1) return null;
+	const id = pathParts[index + 1];
+	if (!id) return null;
+	return VIDEO_ID_PATTERN.test(id) ? id : null;
+}
+
 export function parseYouTubeId(input: string): string | null {
 	const trimmed = input.trim();
 	if (!trimmed) return null;
@@ -9,30 +24,24 @@ export function parseYouTubeId(input: string): string | null {
 	}
 
 	try {
-		const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+		const href = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+		const url = new URL(href);
 		const host = url.hostname.replace(/^www\./, "");
 
 		if (host === "youtu.be") {
 			const id = url.pathname.slice(1).split("/")[0];
-			return VIDEO_ID_PATTERN.test(id) ? id : null;
+			return id && VIDEO_ID_PATTERN.test(id) ? id : null;
 		}
 
-		if (host === "youtube.com" || host === "m.youtube.com") {
-			const v = url.searchParams.get("v");
-			if (v && VIDEO_ID_PATTERN.test(v)) return v;
+		if (!YOUTUBE_HOSTS.has(host)) return null;
 
-			const pathParts = url.pathname.split("/").filter(Boolean);
-			const embedIndex = pathParts.indexOf("embed");
-			if (embedIndex !== -1 && pathParts[embedIndex + 1]) {
-				const id = pathParts[embedIndex + 1];
-				return VIDEO_ID_PATTERN.test(id) ? id : null;
-			}
+		const v = url.searchParams.get("v");
+		if (v && VIDEO_ID_PATTERN.test(v)) return v;
 
-			const liveIndex = pathParts.indexOf("live");
-			if (liveIndex !== -1 && pathParts[liveIndex + 1]) {
-				const id = pathParts[liveIndex + 1];
-				return VIDEO_ID_PATTERN.test(id) ? id : null;
-			}
+		const pathParts = url.pathname.split("/").filter(Boolean);
+		for (const marker of ["embed", "live", "shorts"]) {
+			const id = youtubeIdFromPath(pathParts, marker);
+			if (id) return id;
 		}
 	} catch {
 		return null;
