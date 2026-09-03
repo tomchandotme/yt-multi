@@ -1,4 +1,4 @@
-import { isStream, parseStream, type Stream } from "./stream";
+import { isStream, parseStream, parseTwitchChannel, uniqueStreams, type Stream } from "./stream";
 
 const STORAGE_KEY = "yt-multi:streams";
 const LABELS_KEY = "yt-multi:labels-pinned";
@@ -73,11 +73,24 @@ function readStreams(value: unknown): Stream[] {
 	const record = value as Record<string, unknown>;
 	if (!Array.isArray(record.streams)) return [];
 
-	if (record.v === 2) {
-		return record.streams.filter(isStream);
-	}
+	const parsed =
+		record.v === 2
+			? record.streams.flatMap((item) => {
+					const stream = canonicalizeStream(item);
+					return stream ? [stream] : [];
+				})
+			: record.streams.flatMap((id) => {
+					const stream = typeof id === "string" ? parseStream(id) : null;
+					return stream ? [stream] : [];
+				});
 
-	return record.streams
-		.map((id) => (typeof id === "string" ? parseStream(id) : null))
-		.filter((stream): stream is Stream => stream !== null);
+	return uniqueStreams(parsed);
+}
+
+function canonicalizeStream(value: unknown): Stream | null {
+	if (!isStream(value)) return null;
+	if (value.kind !== "twitch") return value;
+	const id = parseTwitchChannel(`https://twitch.tv/${value.id}`);
+	if (!id) return null;
+	return { kind: "twitch", id };
 }

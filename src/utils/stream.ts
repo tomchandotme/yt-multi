@@ -48,7 +48,10 @@ export function isStream(value: unknown): value is Stream {
 		return typeof record.id === "string" && parseYouTubeId(record.id) === record.id;
 	}
 	if (record.kind === "twitch") {
-		return typeof record.id === "string" && TWITCH_CHANNEL.test(record.id);
+		return (
+			typeof record.id === "string" &&
+			parseTwitchChannel(`https://twitch.tv/${record.id}`) !== null
+		);
 	}
 	return false;
 }
@@ -57,7 +60,8 @@ export function parseTwitchChannel(input: string): string | null {
 	const trimmed = input.trim();
 	if (!trimmed) return null;
 	try {
-		const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+		const href = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+		const url = new URL(href);
 		const host = url.hostname.replace(/^www\./, "");
 		if (host === "clips.twitch.tv") return null;
 		if (host !== "twitch.tv" && host !== "m.twitch.tv") return null;
@@ -65,7 +69,6 @@ export function parseTwitchChannel(input: string): string | null {
 		if (parts.length !== 1) return null;
 		const channel = parts[0]?.toLowerCase();
 		if (!channel || TWITCH_SKIP.has(channel)) return null;
-		if (channel.startsWith("videos")) return null;
 		return TWITCH_CHANNEL.test(channel) ? channel : null;
 	} catch {
 		return null;
@@ -83,11 +86,26 @@ export function attemptAdd(input: string, existing: readonly Stream[]): AddAttem
 	return { kind: "ok", stream };
 }
 
-export function addStream(existing: Stream[], input: string | Stream): Stream[] {
-	const stream = typeof input === "string" ? parseStream(input) : input;
-	if (!stream) return existing;
+export function addStream(existing: Stream[], stream: Stream): Stream[] {
 	if (existing.some((item) => sameStream(item, stream))) return existing;
 	return [...existing, stream];
+}
+
+export function uniqueStreams(streams: readonly Stream[]): Stream[] {
+	const seen = new Set<string>();
+	const next: Stream[] = [];
+	for (const stream of streams) {
+		const key = streamKey(stream);
+		if (seen.has(key)) continue;
+		seen.add(key);
+		next.push(stream);
+	}
+	return next;
+}
+
+export function parseGridIndex(raw: string): number | null {
+	if (!/^\d+$/.test(raw)) return null;
+	return Number.parseInt(raw, 10);
 }
 
 export function moveStream(streams: Stream[], from: number, to: number): Stream[] {

@@ -68,7 +68,19 @@ describe("loadStreams", () => {
 				savedAt: Date.now() - 1000,
 			}),
 		);
-		expect(loadStreams()).toEqual([yt, yt]);
+		expect(loadStreams()).toEqual([yt]);
+	});
+
+	test("dedupes v2 streams by identity", () => {
+		memory.set(
+			STORAGE_KEY,
+			JSON.stringify({
+				v: 2,
+				streams: [yt, yt, { kind: "twitch", id: "Twitch" }],
+				savedAt: Date.now() - 1000,
+			}),
+		);
+		expect(loadStreams()).toEqual([yt, { kind: "twitch", id: "twitch" }]);
 	});
 
 	test("loads v2 streams and drops unknown kinds", () => {
