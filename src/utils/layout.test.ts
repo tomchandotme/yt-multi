@@ -1,8 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { computeOptimalLayout } from "./layout";
+import { computeOptimalLayout, LABEL_STRIP_PX } from "./layout";
 
 const ASPECT = 16 / 9;
-const STRIP = 28;
 
 describe("computeOptimalLayout", () => {
 	test("empty or zero box", () => {
@@ -35,8 +34,8 @@ describe("computeOptimalLayout", () => {
 	});
 
 	test("player stays 16:9 when a name strip is reserved", () => {
-		const layout = computeOptimalLayout(3, 400, 900, STRIP);
-		const playerHeight = layout.tileHeight - STRIP;
+		const layout = computeOptimalLayout(3, 400, 900, LABEL_STRIP_PX);
+		const playerHeight = layout.tileHeight - LABEL_STRIP_PX;
 		expect(playerHeight).toBeGreaterThan(0);
 		expect(layout.tileWidth / playerHeight).toBeCloseTo(ASPECT, 5);
 	});

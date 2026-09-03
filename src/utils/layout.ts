@@ -1,3 +1,5 @@
+export const LABEL_STRIP_PX = 28;
+
 const ASPECT_RATIO = 16 / 9;
 
 export interface OptimalLayout {

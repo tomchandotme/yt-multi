@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
-import { computeOptimalLayout } from "../utils/layout";
-import { streamKey, type Stream } from "../utils/stream";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent } from "react";
+import { computeOptimalLayout, LABEL_STRIP_PX } from "../utils/layout";
+import { parseGridIndex, streamKey, type Stream } from "../utils/stream";
 import { fetchTwitchTitle } from "../utils/twitch";
 import { fetchVideoTitle } from "../utils/youtube";
 import { TwitchEmbed } from "./TwitchEmbed";
@@ -14,8 +14,6 @@ interface StreamGridProps {
 	labelsPinned: boolean;
 }
 
-const LABEL_STRIP_PX = 28;
-
 export function StreamGrid({
 	streams,
 	onRemove,
@@ -26,9 +24,14 @@ export function StreamGrid({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [size, setSize] = useState({ width: 0, height: 0 });
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
+
+		const rect = container.getBoundingClientRect();
+		if (rect.width > 0 && rect.height > 0) {
+			setSize({ width: rect.width, height: rect.height });
+		}
 
 		const observer = new ResizeObserver((entries) => {
 			const entry = entries[0];
@@ -73,50 +76,67 @@ export function StreamGrid({
 	]
 		.filter(Boolean)
 		.join(" ");
+	const ready = layout.cols > 0 && layout.rows > 0;
 
 	return (
 		<div
 			ref={containerRef}
 			className={gridClass}
 			style={{
-				gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-				gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-			}}
+				gridTemplateColumns: ready ? `repeat(${layout.cols}, 1fr)` : undefined,
+				gridTemplateRows: ready ? `repeat(${layout.rows}, 1fr)` : undefined,
+				["--label-strip"]: `${LABEL_STRIP_PX}px`,
+			} as CSSProperties}
 		>
-			{streams.map((stream, index) => (
-				<StreamCell
-					key={streamKey(stream)}
-					index={index}
-					stream={stream}
-					width={Math.floor(layout.tileWidth)}
-					height={Math.floor(layout.tileHeight)}
-					labelsPinned={labelsPinned}
-					onRemove={onRemove}
-					onReorder={onReorder}
-					onDragActive={setDragging}
-				/>
-			))}
+			{ready
+				? streams.map((stream, index) => (
+						<StreamCell
+							key={streamKey(stream)}
+							index={index}
+							cols={layout.cols}
+							stream={stream}
+							width={Math.floor(layout.tileWidth)}
+							height={Math.floor(layout.tileHeight)}
+							labelsPinned={labelsPinned}
+							acceptDrop={dragging}
+							onRemove={onRemove}
+							onReorder={onReorder}
+							onDragActive={setDragging}
+						/>
+					))
+				: null}
 		</div>
 	);
 }
 
 interface StreamCellProps {
 	index: number;
+	cols: number;
 	stream: Stream;
 	width: number;
 	height: number;
 	labelsPinned: boolean;
+	acceptDrop: boolean;
 	onRemove: (stream: Stream) => void;
 	onReorder: (from: number, to: number) => void;
 	onDragActive: (active: boolean) => void;
 }
 
+function fetchStreamTitle(stream: Stream, signal: AbortSignal) {
+	if (stream.kind === "youtube") return fetchVideoTitle(stream.id, signal);
+	if (stream.kind === "twitch") return fetchTwitchTitle(stream.id, signal);
+	const _never: never = stream;
+	return _never;
+}
+
 function StreamCell({
 	index,
+	cols,
 	stream,
 	width,
 	height,
 	labelsPinned,
+	acceptDrop,
 	onRemove,
 	onReorder,
 	onDragActive,
@@ -125,11 +145,7 @@ function StreamCell({
 
 	useEffect(() => {
 		const abort = new AbortController();
-		const pending =
-			stream.kind === "youtube"
-				? fetchVideoTitle(stream.id, abort.signal)
-				: fetchTwitchTitle(stream.id, abort.signal);
-		pending.then((next) => {
+		fetchStreamTitle(stream, abort.signal).then((next) => {
 			if (!abort.signal.aborted && next) setTitle(next);
 		});
 		return () => abort.abort();
@@ -151,6 +167,7 @@ function StreamCell({
 	}
 
 	function handleDragOver(event: DragEvent<HTMLDivElement>) {
+		if (!acceptDrop) return;
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "move";
 	}
@@ -158,20 +175,31 @@ function StreamCell({
 	function handleDrop(event: DragEvent<HTMLDivElement>) {
 		event.preventDefault();
 		onDragActive(false);
-		const from = Number(event.dataTransfer.getData("text/plain"));
-		if (!Number.isInteger(from)) return;
+		if (!acceptDrop) return;
+		const from = parseGridIndex(event.dataTransfer.getData("text/plain"));
+		if (from === null) return;
 		onReorder(from, index);
 	}
 
 	function handleHandleKey(event: KeyboardEvent<HTMLButtonElement>) {
-		if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+		if (event.key === "ArrowLeft") {
 			event.preventDefault();
 			onReorder(index, index - 1);
 			return;
 		}
-		if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+		if (event.key === "ArrowRight") {
 			event.preventDefault();
 			onReorder(index, index + 1);
+			return;
+		}
+		if (event.key === "ArrowUp") {
+			event.preventDefault();
+			onReorder(index, index - cols);
+			return;
+		}
+		if (event.key === "ArrowDown") {
+			event.preventDefault();
+			onReorder(index, index + cols);
 		}
 	}
 
@@ -209,12 +237,14 @@ function StreamCell({
 						Remove
 					</button>
 				</div>
-				<StreamPlayer
-					stream={stream}
-					title={label}
-					width={width}
-					height={playerHeight}
-				/>
+				{width > 0 && height > 0 ? (
+					<StreamPlayer
+						stream={stream}
+						title={label}
+						width={width}
+						height={playerHeight}
+					/>
+				) : null}
 			</div>
 		</div>
 	);
